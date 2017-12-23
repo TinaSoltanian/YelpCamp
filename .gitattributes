@@ -1,2 +1,2 @@
-test/fixtures/* -text
-vcbuild.bat text eol=crlf
+*.ejs linguist-language=JavaScript
+*.js linguist-language=JavaScript
