@@ -10,14 +10,16 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 var campgroundSchema = new mongoose.Schema({
     name: String,
-    image: String
+    image: String,
+    description: String
 });
 
 var Campground = mongoose.model("Campground", campgroundSchema);
 
 // Campground.create({
 //     name: "Granite Hill",
-//     image: "http://cdn.onlyinyourstate.com/wp-content/uploads/2017/04/granitehille1-700x604.jpg"
+//     image: "http://cdn.onlyinyourstate.com/wp-content/uploads/2017/04/granitehille1-700x604.jpg",
+//     description: "This is huge granite hill! No restrooms! Beautiful GRANITE!!!"
 // },function(err, campground){
 //   if(err) {
 //       console.log(err);
@@ -37,7 +39,7 @@ app.get("/campgrounds", function(req, res){
        if (err){
            console.log(err);
        }else{
-         res.render("campgrounds",{ campgronds: allCampgrounds });      
+         res.render("index",{ campgronds: allCampgrounds });      
        }
    })
 });
@@ -45,10 +47,12 @@ app.get("/campgrounds", function(req, res){
 app.post("/campgrounds", function(req, res){
   var name = req.body.name;
   var image = req.body.image;
+  var description = req.body.description;
   
   var newCampGround = {
       name: name,
-      image: image
+      image: image,
+      description: description
   };
   
   Campground.create(newCampGround, function(err, campgound){
@@ -62,6 +66,17 @@ app.post("/campgrounds", function(req, res){
 
 app.get("/campgrounds/new",function(req, res){
    res.render("new.ejs") ;
+});
+
+app.get("/campgrounds/:id", function(req, res){
+    Campground.findById(req.params.id, function(err, findCampground){
+       if(err) {
+           console.log(err);
+       }
+       else{
+          res.render("show",{campground: findCampground});    
+       }
+    });
 });
 
 app.listen(process.env.PORT, process.env.IP, function(){
