@@ -1,42 +1,63 @@
-var express = require("express");
-var app = express();
-var faker = require("faker");
-var bodyParser = require("body-parser");
+var express     = require("express"),
+    app         = express(),
+    faker       = require("faker"),
+    bodyParser  = require("body-parser"),
+    mongoose    = require("mongoose");
+
+mongoose.connect("mongodb://localhost/yelp_camp", {useMongoClient: true});
 app.set("view engine","ejs");
-
- var campgronds = [];
-
 app.use(bodyParser.urlencoded({extended: true}));
+
+var campgroundSchema = new mongoose.Schema({
+    name: String,
+    image: String
+});
+
+var Campground = mongoose.model("Campground", campgroundSchema);
+
+// Campground.create({
+//     name: "Granite Hill",
+//     image: "http://cdn.onlyinyourstate.com/wp-content/uploads/2017/04/granitehille1-700x604.jpg"
+// },function(err, campground){
+//   if(err) {
+//       console.log(err);
+//   }else{
+//       console.log("New insrted campground: ");
+//       console.log(campground);
+//   }
+// });
+
 app.get("/", function(req, res){
     res.render("landing");
 });
 
 app.get("/campgrounds", function(req, res){
    
-    campgronds = [];
-    for (var i = 0; i < 10; i++) {
-        var cg = {
-            name: faker.name.firstName(),
-            image: "https://img.buzzfeed.com/buzzfeed-static/static/2017-01/27/11/asset/buzzfeed-prod-fastlane-02/sub-buzz-16825-1485533127-1.jpg?downsize=715:*&output-format=auto&output-quality=auto"
-            // image: faker.image.imageUrl() 
-        };
-        campgronds.push(cg);
-    }
-    
-    res.render("campgrounds",{ campgronds: campgronds });
+   Campground.find({}, function(err, allCampgrounds){
+       if (err){
+           console.log(err);
+       }else{
+         res.render("campgrounds",{ campgronds: allCampgrounds });      
+       }
+   })
 });
 
 app.post("/campgrounds", function(req, res){
   var name = req.body.name;
   var image = req.body.image;
   
-  var cg = {
+  var newCampGround = {
       name: name,
       image: image
   };
   
-  campgronds.push(cg);
-  res.redirect("/campgrounds")
+  Campground.create(newCampGround, function(err, campgound){
+      if(err){
+          console.log(err);
+      } else{
+        res.redirect("/campgrounds");      
+      }
+  })
 });
 
 app.get("/campgrounds/new",function(req, res){
