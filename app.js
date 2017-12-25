@@ -43,7 +43,7 @@ app.get("/campgrounds", function(req, res){
        if (err){
            console.log(err);
        }else{
-         res.render("index",{ campgronds: allCampgrounds });      
+         res.render("campgrounds/index",{ campgronds: allCampgrounds });      
        }
    })
 });
@@ -69,7 +69,7 @@ app.post("/campgrounds", function(req, res){
 });
 
 app.get("/campgrounds/new",function(req, res){
-   res.render("new.ejs") ;
+   res.render("campgrounds/new") ;
 });
 
 app.get("/campgrounds/:id", function(req, res){
@@ -78,10 +78,24 @@ app.get("/campgrounds/:id", function(req, res){
            console.log(err);
        }
        else{
-          res.render("show",{campground: findCampground});    
+          res.render("campgrounds/show",{campground: findCampground});    
        }
     });
 });
+
+//===================
+// comments routs
+//===================
+app.get("/campgrounds/:id/comments/new", function(req, res) {
+    Campground.findById(req.params.id, function (err, campground) {
+        if(err){
+            console.log(err);
+        }
+        else{
+          res.render("comments/new", {campground: campground});       
+        }
+    })
+})
 
 app.listen(process.env.PORT, process.env.IP, function(){
    console.log("Server has started") ;
