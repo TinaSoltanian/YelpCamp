@@ -12,6 +12,7 @@ SeedDB();
 mongoose.connect("mongodb://localhost/yelp_camp", {useMongoClient: true});
 app.set("view engine","ejs");
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static(__dirname + "/public"));
 
 // var campgroundSchema = new mongoose.Schema({
 //     name: String,
