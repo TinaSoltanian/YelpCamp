@@ -13,15 +13,16 @@ var express     = require("express"),
 SeedDB();
 
 mongoose.connect("mongodb://localhost/yelp_camp", {useMongoClient: true});
+mongoose.Promise = global.Promise;
 app.set("view engine","ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + "/public"));
 
 //passport configuration
 app.use(require("express-session")({
-    secret: "I LIKE THIS PROJECT!",
-    resave: false,
-    saveUninitialized: false
+   secret: "this is secret!",
+   resave: false,
+   saveUninitialized: false
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -121,6 +122,8 @@ app.get("/register", function(req, res) {
 });
 
 app.post("/register", function(req, res) {
+    console.log(req.body.username);
+    console.log(req.body.password);
     var newUser = new user({username: req.body.username}); 
     user.register(newUser, req.body.password, function(err, user){
         if(err){
@@ -133,6 +136,17 @@ app.post("/register", function(req, res) {
         })
     });
 });
+
+app.get("/login",function(req, res) {
+    res.render("login");
+});
+
+app.post("/login", passport.authenticate("local", {
+    successRedirect: "/campgrounds",
+    failureRedirect: "/login"
+}), function(req, res){
+});
+
 
 app.listen(process.env.PORT, process.env.IP, function(){
    console.log("Server has started") ;
