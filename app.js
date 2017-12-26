@@ -143,8 +143,7 @@ app.get("/login",function(req, res) {
 
 app.post("/login", passport.authenticate("local", {
     successRedirect: "/campgrounds",
-    failureRedirect: "/login"
-}), function(req, res){
+    failureRedirect: "/login"}), function(req, res){
 });
 
 
