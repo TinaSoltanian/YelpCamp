@@ -5,8 +5,11 @@ var express     = require("express"),
     mongoose    = require("mongoose"),
     Campground  = require("./models/campground"),
     Comment     = require("./models/comment"),
-    SeedDB      = require("./seeds");
-
+    SeedDB      = require("./seeds"),
+    passport    = require("passport"),
+    localStrategy= require("passport-local"),
+    user         = require("./models/user");
+ 
 SeedDB();
 
 mongoose.connect("mongodb://localhost/yelp_camp", {useMongoClient: true});
