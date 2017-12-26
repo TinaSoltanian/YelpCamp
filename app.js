@@ -17,26 +17,17 @@ app.set("view engine","ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + "/public"));
 
-// var campgroundSchema = new mongoose.Schema({
-//     name: String,
-//     image: String,
-//     description: String
-// });
-
-// var Campground = mongoose.model("Campground", campgroundSchema);
-
-// Campground.create({
-//     name: "Granite Hill",
-//     image: "http://cdn.onlyinyourstate.com/wp-content/uploads/2017/04/granitehille1-700x604.jpg",
-//     description: "This is huge granite hill! No restrooms! Beautiful GRANITE!!!"
-// },function(err, campground){
-//   if(err) {
-//       console.log(err);
-//   }else{
-//       console.log("New insrted campground: ");
-//       console.log(campground);
-//   }
-// });
+//passport configuration
+app.use(require("express-session")({
+    secret: "I LIKE THIS PROJECT!",
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new localStrategy(user.authenticate()));
+passport.serializeUser(user.serializeUser());
+passport.deserializeUser(user.deserializeUser());
 
 app.get("/", function(req, res){
     res.render("landing");
@@ -121,6 +112,27 @@ app.post("/campgrounds/:id/comments", function (req, res) {
         }
     })
 })
+
+//=============
+// AUTH ROUTE
+//=============
+app.get("/register", function(req, res) {
+    res.render("register");
+});
+
+app.post("/register", function(req, res) {
+    var newUser = new user({username: req.body.username}); 
+    user.register(newUser, req.body.password, function(err, user){
+        if(err){
+            console.log(err);
+            return res.render("register");
+        }
+        
+        passport.authenticate("local")(req, res, function(){
+            res.redirect("/campgrounds");
+        })
+    });
+});
 
 app.listen(process.env.PORT, process.env.IP, function(){
    console.log("Server has started") ;
