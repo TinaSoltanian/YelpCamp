@@ -47,11 +47,13 @@
                            <span class="pull-right">10 days ago</span>
                            <p>
                               <%= comment.text %>
-                           </p>                          
-                           <a class="btn btn-xs btn-warning" href="/campgrounds/<%=campground._id%>/comments/<%=comment._id%>/edit">Edit</a>
-                           <form class="delete_form" action="/campgrounds/<%=campground._id%>/comments/<%=comment._id%>/?_method=DELETE" method="POST">
-                               <button class="btn btn-xs btn-danger">Delete</button>
-                           </form>
+                           </p>   
+                           <% if (currentUser && comment.author.id.equals(currentUser._id)){ %>
+                               <a class="btn btn-xs btn-warning" href="/campgrounds/<%=campground._id%>/comments/<%=comment._id%>/edit">Edit</a>
+                               <form class="delete_form" action="/campgrounds/<%=campground._id%>/comments/<%=comment._id%>/?_method=DELETE" method="POST">
+                                   <button class="btn btn-xs btn-danger">Delete</button>
+                               </form>
+                           <% } %>
                         </div>
                     </div>                           
  
