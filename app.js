@@ -1,14 +1,14 @@
 var express     = require("express"),
     app         = express(),
-    faker       = require("faker"),
     bodyParser  = require("body-parser"),
     mongoose    = require("mongoose"),
-    Campground  = require("./models/campground"),
-    Comment     = require("./models/comment"),
+    // Campground  = require("./models/campground"),
+    // Comment     = require("./models/comment"),
     SeedDB      = require("./seeds"),
     passport    = require("passport"),
     localStrategy= require("passport-local"),
-    user         = require("./models/user");
+    user         = require("./models/user"),
+    methodOverride = require("method-override");
     
 var commentsRoute = require("./routes/comments"),
     campgrondsRoute = require("./routes/campgrounds"),
@@ -21,6 +21,7 @@ mongoose.Promise = global.Promise;
 app.set("view engine","ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + "/public"));
+app.use(methodOverride("_method"));
 
 //passport configuration
 app.use(require("express-session")({
