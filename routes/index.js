@@ -8,8 +8,6 @@ router.get("/register", function(req, res) {
 });
 
 router.post("/register", function(req, res) {
-    console.log(req.body.username);
-    console.log(req.body.password);
     var newUser = new user({username: req.body.username}); 
     user.register(newUser, req.body.password, function(err, user){
         if(err){
