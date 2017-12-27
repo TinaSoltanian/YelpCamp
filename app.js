@@ -14,7 +14,7 @@ var commentsRoute = require("./routes/comments"),
     campgrondsRoute = require("./routes/campgrounds"),
     indexRoute = require("./routes/index");
  
-SeedDB();
+//SeedDB();
 
 mongoose.connect("mongodb://localhost/yelp_camp", {useMongoClient: true});
 mongoose.Promise = global.Promise;
