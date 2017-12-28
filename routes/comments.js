@@ -6,8 +6,9 @@ var middleware = require("../middleware");
 
 router.get("/new", middleware.isLoggedIn, function(req, res) {
     Campground.findById(req.params.id, function (err, campground) {
-        if(err){
-            console.log(err);
+        if(err || !campground){
+            req.flash("error", "Campground not found");
+            req.redirect("back");
         }
         else{
           res.render("comments/new", {campground: campground});       
@@ -17,8 +18,8 @@ router.get("/new", middleware.isLoggedIn, function(req, res) {
 
 router.post("/", middleware.isLoggedIn, function (req, res) {
     Campground.findById(req.params.id, function(err, campground) {
-        if(err){
-            console.log(err);
+        if(err || !campground){
+            req.flash("error","Campground not found")
             res.redirect("/campgrounds");
         }else{
             Comment.create(req.body.comment, function(err, comment){
@@ -42,11 +43,19 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
 
 //edit comment route
 router.get("/:comment_id/edit", middleware.CheckCommentOwnership, function(req, res){
-    Comment.findById(req.params.comment_id, function(err, comment) {
-        if(err){
-            res.redirect("back")
+    Campground.findById(req.params.id, function(err, foundCampground) {
+        if(err || !foundCampground){
+            req.flash("error", "Campground not found");
+            return res.redirect("back");
         } else {
-           res.render("comments/edit", {campground_id: req.params.id, comment: comment})      
+            Comment.findById(req.params.comment_id, function(err, comment) {
+                if(err || !comment){
+                    req.flash("error", "Comment not found")
+                    res.redirect("back")
+                } else {
+                    res.render("comments/edit", {campground_id: req.params.id, comment: comment})      
+                }
+            })
         }
     })
 })

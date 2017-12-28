@@ -48,19 +48,21 @@ router.get("/new", middleware.isLoggedIn, function(req, res){
 //show
 router.get("/:id", function(req, res){
     Campground.findById(req.params.id).populate("comments").exec(function(err, findCampground){
-       if(err) {
-           console.log(err);
-       }
-       else{
+      if(err || !findCampground) {
+          req.flash("error","Campground not found");
+          return res.redirect("/campgrounds");
+      }
+      else{
           res.render("campgrounds/show",{campground: findCampground});    
-       }
+      }
     });
 });
 
 //edit campground
 router.get("/:id/edit", middleware.CheckCampgroundOwnership, function(req, res) {
     Campground.findById(req.params.id, function(err, foundCampground){
-        if (err){
+        if (err || !foundCampground){
+            req.flash("error", "Campground not found")
             res.redirect("/campgrounds")
         } else {
              res.render("campgrounds/edit", {campgound: foundCampground});
