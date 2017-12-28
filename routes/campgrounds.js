@@ -3,6 +3,7 @@ var router = express.Router();
 var Campground = require("../models/campground");
 var middleware = require("../middleware");
 
+//index show all campgrounds
 router.get("/", function(req, res){
    
    Campground.find({}, function(err, allCampgrounds){
@@ -14,6 +15,7 @@ router.get("/", function(req, res){
    })
 });
 
+//create campground
 router.post("/", middleware.isLoggedIn, function(req, res){
   var name = req.body.name;
   var image = req.body.image;
@@ -38,10 +40,12 @@ router.post("/", middleware.isLoggedIn, function(req, res){
   })
 });
 
+//new campground
 router.get("/new", middleware.isLoggedIn, function(req, res){
    res.render("campgrounds/new") ;
 });
 
+//show
 router.get("/:id", function(req, res){
     Campground.findById(req.params.id).populate("comments").exec(function(err, findCampground){
        if(err) {
