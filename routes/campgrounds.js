@@ -28,6 +28,12 @@ router.post("/", middleware.isLoggedIn, function(req, res){
   }
   
 geocoder.geocode(req.body.location, function (err, data) {
+    
+    if (err || data.status === 'ZERO_RESULTS'  || data.results == []) {
+      req.flash('error', 'Invalid address');
+      return res.redirect('back');
+    }
+    
     var lat = data.results[0].geometry.location.lat;
     var lng = data.results[0].geometry.location.lng;
     var location = data.results[0].formatted_address;
@@ -43,7 +49,7 @@ geocoder.geocode(req.body.location, function (err, data) {
           lng: lng
       };
       
-      Campground.create(newCampGround, function(err, campgound){
+      Campground.create(newCampGround, function(err, campground){
           if(err){
               console.log(err);
           } else{
@@ -78,18 +84,30 @@ router.get("/:id/edit", middleware.CheckCampgroundOwnership, function(req, res) 
             req.flash("error", "Campground not found")
             res.redirect("/campgrounds")
         } else {
-             res.render("campgrounds/edit", {campgound: foundCampground});
+             res.render("campgrounds/edit", {campground: foundCampground});
         }
     })
 });
 
 //update logic for edited campground
 router.put("/:id", function(req, res){
-  geocoder.geocode(req.body.location, function (err, data) {
+  geocoder.geocode(req.body.campground.location, function (err, data) {
+
+    if (err || data.status === 'ZERO_RESULTS' || data.results == []) {
+      req.flash('error', 'Invalid address');
+      return res.redirect('back');
+    }
+    
     var lat = data.results[0].geometry.location.lat;
     var lng = data.results[0].geometry.location.lng;
     var location = data.results[0].formatted_address;
-    var newData = {name: req.body.name, image: req.body.image, description: req.body.description, cost: req.body.cost, location: location, lat: lat, lng: lng};
+    var newData = {name: req.body.campground.name, 
+                  image: req.body.campground.image, 
+                  description: req.body.campground.description, 
+                  price: req.body.campground.price, 
+                  location: location, 
+                  lat: lat, 
+                  lng: lng};
     Campground.findByIdAndUpdate(req.params.id, {$set: newData}, function(err, campground){
         if(err){
             req.flash("error", err.message);
