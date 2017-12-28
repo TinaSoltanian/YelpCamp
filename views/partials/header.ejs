@@ -33,4 +33,17 @@
                    </ul>
                </div>
             </div>
-        </nav>            
+        </nav>         
+        
+        <div class="container">
+            <% if (error && error.length > 0) {%>
+                <div>
+                   <div class="alert alert-danger"><p><%=error %></p></div> 
+                </div>
+            <% } %>
+            <% if (success && success.length > 0) { %>
+                <div>
+                   <div class="alert alert-success"><p><%=success %></p></div>
+                </div>
+            <% } %>
+        </div>
