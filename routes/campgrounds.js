@@ -6,14 +6,28 @@ var geocoder = require('geocoder');
 
 //index show all campgrounds
 router.get("/", function(req, res){
-   
-   Campground.find({}, function(err, allCampgrounds){
-       if (err){
-           console.log(err);
-       }else{
-         res.render("campgrounds/index",{ campgronds: allCampgrounds, page: "campgrounds" });      
-       }
-   })
+   if(req.query.search){
+         var regex = new RegExp(escapeRegExp(req.query.search), "gi");
+         Campground.find({ 
+             "$or" : [ {name: regex},
+                        {description: regex}
+                 ]
+         }, function(err, allCampgrounds){
+               if (err){
+                   console.log(err);
+               }else{
+                 res.render("campgrounds/index",{ campgronds: allCampgrounds, page: "campgrounds" });      
+               }
+           })       
+   } else {
+       Campground.find({}, function(err, allCampgrounds){
+           if (err){
+               console.log(err);
+           }else{
+             res.render("campgrounds/index",{ campgronds: allCampgrounds, page: "campgrounds" });      
+           }
+       })
+   }
 });
 
 //create campground
@@ -130,5 +144,9 @@ router.delete("/:id", middleware.CheckCampgroundOwnership, function(req, res){
         }
     })
 })
+
+function escapeRegExp(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
 
 module.exports = router;
