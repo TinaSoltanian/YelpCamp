@@ -53,6 +53,7 @@ router.get("/", function(req, res){
 
 //create campground
 router.post("/", middleware.isLoggedIn, upload.single("image"), function(req, res){
+       
     cloudinary.uploader.upload(req.file.path, function(result){
 
         req.body.campground.image = result.secure_url;
@@ -60,7 +61,7 @@ router.post("/", middleware.isLoggedIn, upload.single("image"), function(req, re
             id: req.user._id,
             username: req.user.username
         }
-      
+    
         geocoder.geocode(req.body.campground.location, function (err, data) {
             
             if (err || data.status === 'ZERO_RESULTS'  || data.results == []) {
@@ -75,7 +76,7 @@ router.post("/", middleware.isLoggedIn, upload.single("image"), function(req, re
         req.body.campground.location = location;
         req.body.campground.lat = lat;
         req.body.campground.lng = lng;
-        console.log(req.body.campground);
+
           Campground.create(req.body.campground, function(err, campground){
               if(err){
                   req.flash("error", err.message)
@@ -120,34 +121,49 @@ router.get("/:id/edit", middleware.CheckCampgroundOwnership, function(req, res) 
 });
 
 //update logic for edited campground
-router.put("/:id", function(req, res){
-  geocoder.geocode(req.body.campground.location, function (err, data) {
-
-    if (err || data.status === 'ZERO_RESULTS' || data.results == []) {
-      req.flash('error', 'Invalid address');
-      return res.redirect('back');
-    }
+router.put("/:id", upload.single("image"), function(req, res){
     
-    var lat = data.results[0].geometry.location.lat;
-    var lng = data.results[0].geometry.location.lng;
-    var location = data.results[0].formatted_address;
-    var newData = {name: req.body.campground.name, 
-                  image: req.body.campground.image, 
-                  description: req.body.campground.description, 
-                  price: req.body.campground.price, 
-                  location: location, 
-                  lat: lat, 
-                  lng: lng};
-    Campground.findByIdAndUpdate(req.params.id, {$set: newData}, function(err, campground){
-        if(err){
-            req.flash("error", err.message);
-            res.redirect("back");
-        } else {
-            req.flash("success","Successfully Updated!");
-            res.redirect("/campgrounds/" + campground._id);
+ cloudinary.uploader.upload(req.file.path, function(result){
+
+        req.body.campground.image = result.secure_url;
+        req.body.campground.author = {
+            id: req.user._id,
+            username: req.user.username
         }
+          
+      geocoder.geocode(req.body.campground.location, function (err, data) {
+    
+        if (err || data.status === 'ZERO_RESULTS' || data.results == []) {
+          req.flash('error', err.message);
+          return res.redirect('back');
+        }
+        console.log(data);
+        var lat = data.results[0].geometry.location.lat;
+        var lng = data.results[0].geometry.location.lng;
+        var location = data.results[0].formatted_address;
+        
+        req.body.campground.location = location;
+        req.body.campground.lat = lat;
+        req.body.campground.lng = lng;        
+        
+        // var newData = {name: req.body.campground.name, 
+        //               image: req.body.campground.image, 
+        //               description: req.body.campground.description, 
+        //               price: req.body.campground.price, 
+        //               location: location, 
+        //               lat: lat, 
+        //               lng: lng};
+        Campground.findByIdAndUpdate(req.params.id, {$set: req.body.campground}, function(err, campground){
+            if(err){
+                req.flash("error", err.message);
+                res.redirect("back");
+            } else {
+                req.flash("success","Successfully Updated!");
+                res.redirect("/campgrounds/" + campground._id);
+            }
+        });
+      });
     });
-  });
 });
 
 //delete campground
